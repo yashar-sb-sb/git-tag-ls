@@ -6,10 +6,12 @@ import re
 import subprocess
 import colorama
 
+lengths = {'relative' : 25, 'local' : 35}
+
+date_type = sys.argv[1] if len(sys.argv) > 1 else 'relative'
 
 
-
-result = subprocess.run(['git', 'for-each-ref', '--sort=creatordate', '--format', "---<begin>--- ---<tag_date>--- %(creatordate:relative) /---<tag_date>--- ---<tag_name>--- %(refname:strip=2) /---<tag_name>--- ---<tag_author>--- %(creator) /---<tag_author>--- ---<commit_subject>--- %(subject) /---<commit_subject>--- ---<commit_author>--- %(authorname) /---<commit_author>--- ---<commit_date>--- %(authordate:relative) /---<commit_date>--- ---<end>---", 'refs/tags'], stdout=subprocess.PIPE)
+result = subprocess.run(['git', 'for-each-ref', '--sort=creatordate', '--format', "---<begin>--- ---<tag_date>--- %(creatordate:{}) /---<tag_date>--- ---<tag_name>--- %(refname:strip=2) /---<tag_name>--- ---<tag_author>--- %(creator) /---<tag_author>--- ---<commit_subject>--- %(subject) /---<commit_subject>--- ---<commit_author>--- %(authorname) /---<commit_author>--- ---<commit_date>--- %(authordate:{}) /---<commit_date>--- ---<end>---".format(date_type, date_type), 'refs/tags'], stdout=subprocess.PIPE)
 
 
 class git_tag():
@@ -40,12 +42,12 @@ class git_tag():
 
     def __str__(self):
         return (
-(colorama.Fore.BLUE + self.tag_date + colorama.Style.RESET_ALL).ljust(25)
+(colorama.Fore.BLUE + self.tag_date + colorama.Style.RESET_ALL).ljust(lengths[date_type])
 +(colorama.Back.WHITE + colorama.Fore.RED + self.tag_name + colorama.Style.RESET_ALL).ljust(40)
 +(colorama.Fore.WHITE + self.tag_author + colorama.Style.RESET_ALL).ljust(35)
 +(colorama.Fore.GREEN + self.commit_subject.ljust(70)[:70].ljust(71) + colorama.Style.RESET_ALL)
 +(colorama.Fore.RED + self.commit_author + colorama.Style.RESET_ALL).ljust(35)
-+(colorama.Fore.CYAN + self.commit_date).rjust(25)
++(colorama.Fore.CYAN + self.commit_date).rjust(lengths[date_type])
                 )
 
 
