@@ -8,7 +8,9 @@ import colorama
 
 lengths = {'relative' : 25, 'local' : 35}
 
-date_type = sys.argv[1] if len(sys.argv) > 1 else 'relative'
+argv = sys.argv
+
+date_type = 'local' if 'local' in argv else 'relative'
 
 
 result = subprocess.run(['git', 'for-each-ref', '--sort=creatordate', '--format', "---<begin>--- ---<tag_date>--- %(creatordate:{}) /---<tag_date>--- ---<tag_name>--- %(refname:strip=2) /---<tag_name>--- ---<tag_author>--- %(creator) /---<tag_author>--- ---<commit_subject>--- %(subject) /---<commit_subject>--- ---<commit_author>--- %(authorname) /---<commit_author>--- ---<commit_date>--- %(authordate:{}) /---<commit_date>--- ---<end>---".format(date_type, date_type), 'refs/tags'], stdout=subprocess.PIPE)
@@ -43,12 +45,20 @@ class git_tag():
     def __str__(self):
         return (
 (colorama.Fore.BLUE + self.tag_date + colorama.Style.RESET_ALL).ljust(lengths[date_type])
-+(colorama.Back.WHITE + colorama.Fore.RED + self.tag_name + colorama.Style.RESET_ALL).ljust(40)
 +(colorama.Fore.WHITE + self.tag_author + colorama.Style.RESET_ALL).ljust(35)
++(colorama.Back.WHITE + colorama.Fore.RED + self.tag_name + colorama.Style.RESET_ALL).ljust(40)
 +(colorama.Fore.GREEN + self.commit_subject.ljust(70)[:70].ljust(71) + colorama.Style.RESET_ALL)
 +(colorama.Fore.RED + self.commit_author + colorama.Style.RESET_ALL).ljust(35)
 +(colorama.Fore.CYAN + self.commit_date).rjust(lengths[date_type])
+                ) if "color" in argv else (
+(colorama.Fore.RESET + self.tag_date + colorama.Style.RESET_ALL).ljust(lengths[date_type])
++(colorama.Fore.RESET + self.tag_author + colorama.Style.RESET_ALL).ljust(35)
++(colorama.Fore.LIGHTGREEN_EX + self.tag_name + colorama.Style.RESET_ALL).ljust(40)
++(colorama.Fore.RESET + self.commit_subject.ljust(70)[:70].ljust(71) + colorama.Style.RESET_ALL)
++(colorama.Fore.RESET + self.commit_author + colorama.Style.RESET_ALL).ljust(35)
++(colorama.Fore.RESET + self.commit_date).rjust(lengths[date_type])
                 )
+
 
 
 inp = result.stdout.decode('utf-8')
