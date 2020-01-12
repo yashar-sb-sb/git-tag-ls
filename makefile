@@ -1,5 +1,5 @@
 install: FORCE
-	pip3 install colorama
+	python3 -m pip install colorama
 	cp tags.py /usr/bin/tags
 	chmod +x /usr/bin/tags
 
